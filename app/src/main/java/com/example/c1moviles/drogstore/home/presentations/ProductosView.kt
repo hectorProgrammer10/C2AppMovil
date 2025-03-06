@@ -60,7 +60,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.c1moviles.drogstore.R
-import com.example.c1moviles.drogstore.home.HomeViewModel
+
 import com.example.c1moviles.drogstore.home.data.model.Producto
 import kotlin.reflect.typeOf
 import androidx.compose.ui.platform.LocalContext
