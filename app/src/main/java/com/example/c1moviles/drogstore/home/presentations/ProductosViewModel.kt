@@ -85,8 +85,8 @@ class ProductosViewModel @Inject constructor() : ViewModel() {
 
         // Configura la solicitud de ubicación
         val locationRequest = LocationRequest.create().apply {
-            interval = 5000
-            fastestInterval = 2000
+            interval = 2000
+            fastestInterval = 1000
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
             numUpdates = 1
         }

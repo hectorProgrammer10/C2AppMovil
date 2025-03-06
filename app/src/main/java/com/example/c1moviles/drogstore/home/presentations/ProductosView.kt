@@ -136,7 +136,8 @@ fun FormResource(productosViewModel: ProductosViewModel= hiltViewModel(), navCon
                 .border(0.6.dp, color = Color.Black)
         )
         Button(
-            onClick = { productosViewModel.getLocation(context)
+            onClick = {
+                productosViewModel.getLocation(context)
                 productosViewModel.onChangeNombre(nombre)}
         ) {
             Icon(Icons.Default.Place, contentDescription = "ubicacion")

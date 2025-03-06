@@ -65,7 +65,7 @@ fun RegisterScreen(registerViewModel: RegisterViewModel = hiltViewModel(), navCo
     val context = LocalContext.current
     LaunchedEffect(registrationStatus) {
         if (registrationStatus == true) {
-            navController.navigate("home")
+            navController.navigate("login")
         }
     }
 
