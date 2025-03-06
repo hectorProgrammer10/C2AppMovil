@@ -48,12 +48,7 @@ fun AppNavigator() {
         composable("viewProducto") {
             ViewProductos(productosViewModel = ProductosViewModel(), navController = navController)
         }
-        composable("registerStore") {
-            RegisterStore(registerStoreViewModel = RegisterStoreViewModel(), navController = navController)
-        }
-        composable("viewFarmacia") {
-            ViewFarmacias(farmaciasViewModel = FarmaciasViewModel())
-        }
+
 
 
 
