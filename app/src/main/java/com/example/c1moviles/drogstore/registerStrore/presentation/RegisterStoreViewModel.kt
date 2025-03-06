@@ -85,7 +85,7 @@ class RegisterStoreViewModel @Inject constructor() : ViewModel() {
                     onChangePlace("Ubicación no disponible")
                     Log.d("RegisterStoreViewModel", "La ubicación es null")
                 }
-                // Una vez obtenida la ubicación, eliminamos las actualizaciones para evitar callbacks innecesarios
+
                 fusedLocationClient.removeLocationUpdates(this)
             }
         }

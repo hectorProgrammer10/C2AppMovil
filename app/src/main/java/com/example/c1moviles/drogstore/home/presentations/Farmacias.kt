@@ -24,7 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.c1moviles.R
+import com.example.c1moviles.drogstore.R
 import com.example.c1moviles.drogstore.registerStrore.data.model.Farmacia
 
 @Composable

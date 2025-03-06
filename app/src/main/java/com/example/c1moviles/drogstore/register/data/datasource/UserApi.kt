@@ -16,7 +16,8 @@ suspend fun postUser(user: User): Boolean {
         }
     }
     return try {
-        val response: HttpResponse = client.post("http://10.0.2.2:8080/api/solver/signup") {
+        val response: HttpResponse = client.post("http://10.0.2.2:8080/user"){
+//        val response: HttpResponse = client.post("http://10.0.2.2:8080/api/solver/signup") {
             contentType(ContentType.Application.Json)
             setBody(user)
         }

@@ -1,5 +1,6 @@
 package com.example.c1moviles.drogstore.home.data.datasource
 
+import com.example.c1moviles.drogstore.home.data.model.Pedido
 import com.example.c1moviles.drogstore.home.data.model.Producto
 import io.ktor.client.*
 import io.ktor.client.call.body
@@ -10,16 +11,16 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.gson.*
 
-suspend fun postProducto(producto: Producto): Boolean {
+suspend fun postPedido(pedido: Pedido): Boolean {
     val client = HttpClient(Android) {
         install(ContentNegotiation) {
             gson()
         }
     }
     return try {
-        val response: HttpResponse = client.post("http://10.0.2.2:8080/api/app/ssv/mds") {
+        val response: HttpResponse = client.post("http://10.0.2.2:8080/order") {
             contentType(ContentType.Application.Json)
-            setBody(producto)
+            setBody(pedido)
         }
 
         response.status == HttpStatusCode.OK
@@ -39,7 +40,7 @@ suspend fun getProductos(): List<Producto>? {
     }
 
     return try {
-        val response: HttpResponse = client.get("http://10.0.2.2:8080/api/app/ssv/getMds")
+        val response: HttpResponse = client.get("http://10.0.2.2:8080/producto")
         if (response.status == HttpStatusCode.OK) {
             response.body()
         } else {

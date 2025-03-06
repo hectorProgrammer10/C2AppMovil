@@ -115,7 +115,6 @@ fun RegisterStore(registerStoreViewModel: RegisterStoreViewModel = hiltViewModel
             Text(text = "Obtener ubicación")
         }
 
-        // Muestra la ubicación obtenida (opcional)
         if (place.isNotEmpty()) {
             Spacer(modifier = Modifier.height(10.dp))
             Text(

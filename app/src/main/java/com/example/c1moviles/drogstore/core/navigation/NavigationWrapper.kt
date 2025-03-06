@@ -2,6 +2,7 @@ package com.example.c1moviles.drogstore.core.navigation
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -26,7 +27,7 @@ import com.example.c1moviles.drogstore.registerStrore.presentation.RegisterStore
 @Composable
 fun AppNavigator() {
     val navController = rememberNavController()
-
+    val context = LocalContext.current
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
             LoginScreen(loginViewModel = LoginViewModel(), navController = navController)
@@ -40,11 +41,12 @@ fun AppNavigator() {
         composable("home") {
             Home(navController = navController)
         }
-        composable("addProducto") {
-            FormResource(productosViewModel = ProductosViewModel(), navController = navController)
+        composable("addProducto/{nombre}") {backStackEntry ->
+            val nombre = backStackEntry.arguments?.getString("nombre") ?: ""
+            FormResource(productosViewModel = ProductosViewModel(), navController = navController, nombre=nombre)
         }
         composable("viewProducto") {
-            ViewProductos(productosViewModel = ProductosViewModel())
+            ViewProductos(productosViewModel = ProductosViewModel(), navController = navController)
         }
         composable("registerStore") {
             RegisterStore(registerStoreViewModel = RegisterStoreViewModel(), navController = navController)

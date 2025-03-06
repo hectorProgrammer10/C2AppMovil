@@ -4,14 +4,16 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.dagger.hilt.android)
     id("org.jetbrains.kotlin.kapt")
+
+    id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.example.c1moviles"
+    namespace = "com.example.c1moviles.drogstore"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.c1moviles"
+        applicationId = "com.example.c1moviles.drogstore"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -47,6 +49,9 @@ configurations.all {
     exclude(group = "junit", module = "junit")
 }
 dependencies {
+    implementation("com.google.firebase:firebase-messaging-ktx")
+    implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
+    implementation("com.google.firebase:firebase-analytics")
     implementation(libs.accessibility.test.framework)
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
     implementation("com.google.accompanist:accompanist-permissions:0.30.1")

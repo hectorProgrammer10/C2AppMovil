@@ -1,5 +1,6 @@
 package com.example.c1moviles.drogstore.register.presentation
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -30,6 +31,9 @@ class RegisterViewModel @Inject constructor() : ViewModel() {
     private val _nombre = MutableLiveData("")
     val nombre: LiveData<String> = _nombre
 
+    private val _token = MutableLiveData("")
+    val token: LiveData<String> = _token
+
     // LiveData para el estado de registro
     private val _registrationStatus = MutableLiveData<Boolean>()
     val registrationStatus: LiveData<Boolean> = _registrationStatus
@@ -38,6 +42,14 @@ class RegisterViewModel @Inject constructor() : ViewModel() {
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
+    fun getTokenFromPreferences(context: Context): String? {
+        val sharedPreferences = context.getSharedPreferences("FCM_PREFS", Context.MODE_PRIVATE)
+        val token = sharedPreferences.getString("fcm_token", null) // Corrección aquí
+        Log.d("RegisterViewModel", "Token de FCM obtenido: $token")
+        return token
+    }
+
+
     // Métodos para actualizar cada campo
     fun onChangeUsername(username: String) { _username.value = username }
     fun onChangePassword(password: String) { _password.value = password }
@@ -45,20 +57,25 @@ class RegisterViewModel @Inject constructor() : ViewModel() {
     fun onChangeNombre(nombre: String) { _nombre.value = nombre }
 
     // Llama a la función postUser() pasando los datos del formulario
-    fun registerUser() {
+    fun registerUser(context: Context) {
         viewModelScope.launch {
             Log.d("RegisterViewModel", "Llamando a postUser()")
+
+            val tokenFCM = getTokenFromPreferences(context) ?: ""  // Obtener el token antes de registrar
+
             val user = User(
                 username = _username.value ?: "",
                 password = _password.value ?: "",
                 email = _email.value ?: "",
-                nombre = _nombre.value ?: ""
+                nombre = _nombre.value ?: "",
+                token = tokenFCM // Se usa el token obtenido
             )
+
             val result = postUser(user)
 
             if (result) {
                 _registrationStatus.value = true
-                _errorMessage.value = null  // Limpia cualquier error anterior
+                _errorMessage.value = null
             } else {
                 _registrationStatus.value = false
                 _errorMessage.value = "Error al registrar. Verifica los datos e inténtalo nuevamente."
@@ -67,6 +84,7 @@ class RegisterViewModel @Inject constructor() : ViewModel() {
             Log.d("RegisterViewModel", "Resultado de postUser(): $result")
         }
     }
+
 }
 
 

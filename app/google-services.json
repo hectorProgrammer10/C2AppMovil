@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "33475519147",
+    "project_id": "mensajeria1-9e86d",
+    "storage_bucket": "mensajeria1-9e86d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:33475519147:android:208c8194b9fd76f5f5cdee",
+        "android_client_info": {
+          "package_name": "com.example.c1moviles.drogstore"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvdkoRha0qwbVpTgBg5KS85--MnAN0t_o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -14,22 +14,26 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.gson.gson
 
-suspend fun postUser(user: com.example.c1moviles.drogstore.login.data.model.User): Boolean {
+suspend fun postUser(user: User): Result<Map<String, Any>> {
     val client = HttpClient(Android) {
         install(ContentNegotiation) {
             gson()
         }
     }
     return try {
-        val response: HttpResponse = client.post("http://10.0.2.2:8080/api/auth/signin") {
+        val response: HttpResponse = client.post("http://10.0.2.2:8080/user/signin") {
             contentType(ContentType.Application.Json)
             setBody(user)
         }
 
-        response.status == HttpStatusCode.OK
+        if (response.status == HttpStatusCode.OK) {
+            val responseBody: Map<String, Any> = response.body()
+            Result.success(responseBody)
+        } else {
+            Result.failure(Exception("Error en el login: ${response.status}"))
+        }
     } catch (e: Exception) {
-        e.printStackTrace()
-        false
+        Result.failure(e)
     } finally {
         client.close()
     }

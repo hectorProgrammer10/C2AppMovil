@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Preview
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -58,21 +59,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.c1moviles.R
+import com.example.c1moviles.drogstore.R
 import com.example.c1moviles.drogstore.home.HomeViewModel
 import com.example.c1moviles.drogstore.home.data.model.Producto
 import kotlin.reflect.typeOf
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
-fun FormResource(productosViewModel: ProductosViewModel= hiltViewModel(), navController: NavController){
-    val nombre:String by productosViewModel.nombre.observeAsState("")
-    val precio:Float by productosViewModel.precio.observeAsState(0f)
+fun FormResource(productosViewModel: ProductosViewModel= hiltViewModel(), navController: NavController, nombre: String){
+    val context = LocalContext.current
+    val place:String by productosViewModel.place.observeAsState("")
     val cantidad:Int by productosViewModel.cantidad.observeAsState(0)
-    val receta:String by productosViewModel.receta.observeAsState("")
 
     val registrationStatus by productosViewModel.registrationStatus.observeAsState()
     val errorMessage by productosViewModel.errorMessage.observeAsState("")
-
+    LaunchedEffect(nombre) {
+        productosViewModel.onChangeNombre(nombre)
+    }
     LaunchedEffect(registrationStatus) {
         if (registrationStatus == true) {
             navController.navigate("home")
@@ -93,7 +96,7 @@ fun FormResource(productosViewModel: ProductosViewModel= hiltViewModel(), navCon
         Text(
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
-            text = "Publicar un producto",
+            text = "Confirmar pedido",
             fontSize = 30.sp,
             color = Color.Black
         )
@@ -101,7 +104,7 @@ fun FormResource(productosViewModel: ProductosViewModel= hiltViewModel(), navCon
         TextField(
             value = nombre,
             onValueChange = { productosViewModel.onChangeNombre(it)},
-            label = { Text("Nombre del producto") },
+            label = { Text("platillo") },
             shape = RoundedCornerShape(10.dp),
             placeholder = { Text("") },
             leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Person Icon") },
@@ -116,36 +119,34 @@ fun FormResource(productosViewModel: ProductosViewModel= hiltViewModel(), navCon
 
         Spacer(modifier = Modifier.height(20.dp))
         TextField(
-            value = precio.toString(),
-            onValueChange = { newValue ->
-                // Validar que sea un número decimal válido
-                if (newValue.matches(Regex("^\\d*\\.?\\d*$"))) {
-                    productosViewModel.onChangePrecio(
-                        newValue.toFloatOrNull() ?: 0f
-                    )
-                }
-            },
-            label = { Text("Precio del producto") },
+            value = place,
+            onValueChange = {
+                productosViewModel.onChangePlace(it)
+                productosViewModel.onChangeNombre(nombre) },
+            label = { Text("Lugar de entrega") },
             shape = RoundedCornerShape(10.dp),
-            placeholder = { Text("Ej: 9.99") },
-            leadingIcon = { Icon(Icons.Default.AttachMoney, contentDescription = "precioIcon") },
+            placeholder = { Text("") },
+            leadingIcon = { Icon(Icons.Default.Place, contentDescription = "") },
             colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = Color.White,
                 focusedContainerColor = Color.White
             ),
             modifier = Modifier.fillMaxWidth()
                 .padding(horizontal = 10.dp)
-                .border(0.6.dp, color = Color.Black),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Decimal,
-                imeAction = ImeAction.Done
-            )
+                .border(0.6.dp, color = Color.Black)
         )
+        Button(
+            onClick = { productosViewModel.getLocation(context)
+                productosViewModel.onChangeNombre(nombre)}
+        ) {
+            Icon(Icons.Default.Place, contentDescription = "ubicacion")
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = "Obtener ubicación")
+        }
         Spacer(modifier = Modifier.height(30.dp))
         TextField(
             value = cantidad.toString(),
             onValueChange = { newValue ->
-                // Filtrar solo dígitos y actualizar el ViewModel
                 if (newValue.matches(Regex("^\\d*$"))) {
                     productosViewModel.onChangeCantidad(newValue.toIntOrNull() ?: 0)
                 }
@@ -162,26 +163,9 @@ fun FormResource(productosViewModel: ProductosViewModel= hiltViewModel(), navCon
                 .padding(horizontal = 10.dp)
                 .border(0.6.dp, color = Color.Black),
             keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number // Teclado numérico
+                keyboardType = KeyboardType.Number
             )
         )
-        Spacer(modifier = Modifier.height(30.dp))
-        TextField(
-            value = receta,
-            onValueChange = {productosViewModel.onChangeReceta(it)},
-            label = { Text("Receta") },
-            shape = RoundedCornerShape(10.dp),
-            placeholder = { Text("Si necesita receta / No") },
-            leadingIcon = { Icon(Icons.Default.Comment, contentDescription = "receta") },
-            colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = Color.White,
-                focusedContainerColor = Color.White
-            ),
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 10.dp)
-                .border(0.6.dp, color = Color.Black)
-        )
-
         Spacer(modifier = Modifier.height(20.dp))
         Button(
             onClick = {productosViewModel.registerProducto() },
@@ -193,7 +177,7 @@ fun FormResource(productosViewModel: ProductosViewModel= hiltViewModel(), navCon
                 contentColor = Color.White),
             shape = RoundedCornerShape(0.dp)
         ) {
-            Text(text = "Agregar +",
+            Text(text = "Confirmar pedido",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold)
         }
@@ -210,7 +194,7 @@ fun FormResource(productosViewModel: ProductosViewModel= hiltViewModel(), navCon
 }
 
 @Composable
-fun ViewProductos(productosViewModel: ProductosViewModel = hiltViewModel()) {
+fun ViewProductos(productosViewModel: ProductosViewModel = hiltViewModel(), navController: NavController) {
 
     val productos by productosViewModel.productos.observeAsState(initial = null)
 
@@ -220,12 +204,14 @@ fun ViewProductos(productosViewModel: ProductosViewModel = hiltViewModel()) {
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp).padding(vertical = 30.dp)) {
         Image(
-            painter = painterResource(id = R.drawable.siahorro),
-            contentDescription = "Logo Si Ahorro",
+            painter = painterResource(id = R.drawable.logofast),
+            contentDescription = "Logo",
             modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp)
-                .padding(bottom = 16.dp),
+                .padding(bottom = 16.dp)
+                ,
+
             contentScale = ContentScale.Fit
         )
         if (productos == null) {
@@ -233,8 +219,8 @@ fun ViewProductos(productosViewModel: ProductosViewModel = hiltViewModel()) {
         } else {
             LazyColumn {
                 items(productos!!) { producto ->
-                    ProductoItem(producto)
-                    Spacer(modifier = Modifier.height(8.dp))
+                    ProductoItem(producto, navController=navController)
+                    Spacer(modifier = Modifier.height(3.dp))
                 }
             }
         }
@@ -242,16 +228,41 @@ fun ViewProductos(productosViewModel: ProductosViewModel = hiltViewModel()) {
 }
 
 @Composable
-fun ProductoItem(producto: Producto) {
+fun ProductoItem(producto: Producto, navController: NavController) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFFED887) // Color de fondo de la Card
+        )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = producto.nombre, style = MaterialTheme.typography.titleLarge)
+            Text(
+                text = producto.nombre,
+                style = MaterialTheme.typography.titleLarge
+            )
+            Spacer(modifier = Modifier.height(9.dp))
             Text(text = "Precio: $${producto.precio}")
-            Text(text = "Cantidad: ${producto.cantidad}")
-            Text(text = "Receta: ${producto.receta}")
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(text = "Descripcion: ${producto.descripcion}")
+            Spacer(modifier = Modifier.height(6.dp))
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .graphicsLayer {
+                        shadowElevation = 9.dp.toPx()
+                        shape = CircleShape
+                        clip = true
+
+                    },
+                onClick = {navController.navigate("addProducto/${producto.nombre}")},
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFFFC245), // Color de fondo del botón
+                    contentColor = Color.Black // Color del texto
+                )
+            ) {
+                Text("Pagar", fontWeight = FontWeight.Bold)
+            }
         }
 
     }

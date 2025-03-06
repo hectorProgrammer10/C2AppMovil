@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.c1moviles.R
+import com.example.c1moviles.drogstore.R
 import com.example.c1moviles.drogstore.home.presentations.FormResource
 import com.example.c1moviles.drogstore.home.presentations.ProductosViewModel
 
@@ -39,17 +39,17 @@ fun Home(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Color(0xFFFFC245))
             .padding(30.dp),
         verticalArrangement = Arrangement.Center
     ) {
 
         Image(
-            painter = painterResource(id = R.drawable.siahorro),
-            contentDescription = "Logo Si Ahorro",
+            painter = painterResource(id = R.drawable.logofast),
+            contentDescription = "Logo fast",
             modifier = Modifier
                 .fillMaxWidth()
-                .height(100.dp)
+                .height(160.dp)
                 .padding(bottom = 16.dp),
             contentScale = ContentScale.Fit
         )
@@ -58,54 +58,20 @@ fun Home(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .graphicsLayer {
-                    shadowElevation = 9.dp.toPx()
+                    shadowElevation = 13.dp.toPx()
                     shape = CircleShape
                     clip = true
+
                 },
-            onClick = {
-                navController.navigate("addProducto")
-            }
+            onClick = { navController.navigate("viewProducto") },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White, // Color de fondo del botón
+                contentColor = Color.Black // Color del texto
+            )
         ) {
-            Text("Añadir publicación", color = Color.White, fontWeight = FontWeight.Bold)
+            Text("Ver menú", fontWeight = FontWeight.Bold)
         }
 
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .graphicsLayer {
-                    shadowElevation = 9.dp.toPx()
-                    shape = CircleShape
-                    clip = true
-                },
-            onClick = { navController.navigate("viewProducto") }
-        ) {
-            Text("Ver publicaciones", color = Color.White, fontWeight = FontWeight.Bold)
-        }
 
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .graphicsLayer {
-                    shadowElevation = 9.dp.toPx()
-                    shape = CircleShape
-                    clip = true
-                },
-            onClick = { navController.navigate("registerStore") }
-        ) {
-            Text("Registrarse como farmacia", color = Color.White, fontWeight = FontWeight.Bold)
-        }
-
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .graphicsLayer {
-                    shadowElevation = 9.dp.toPx()
-                    shape = CircleShape
-                    clip = true
-                },
-            onClick = { navController.navigate("viewFarmacia") }
-        ) {
-            Text("Ver farmacias", color = Color.White, fontWeight = FontWeight.Bold)
-        }
     }
 }

@@ -62,7 +62,7 @@ fun RegisterScreen(registerViewModel: RegisterViewModel = hiltViewModel(), navCo
     var isPasswordVisible by remember { mutableStateOf(false) }
     val registrationStatus by registerViewModel.registrationStatus.observeAsState()
     val errorMessage by registerViewModel.errorMessage.observeAsState("")
-
+    val context = LocalContext.current
     LaunchedEffect(registrationStatus) {
         if (registrationStatus == true) {
             navController.navigate("home")
@@ -162,7 +162,7 @@ fun RegisterScreen(registerViewModel: RegisterViewModel = hiltViewModel(), navCo
         )
         Spacer(modifier = Modifier.height(30.dp))
         Button(
-            onClick = { registerViewModel.registerUser() },
+            onClick = { registerViewModel.registerUser(context) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 10.dp)
