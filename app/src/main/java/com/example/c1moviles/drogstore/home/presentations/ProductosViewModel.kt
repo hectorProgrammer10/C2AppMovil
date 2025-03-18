@@ -25,6 +25,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -67,8 +68,8 @@ class ProductosViewModel @Inject constructor(): ViewModel(){
     private var _cantidad = MutableLiveData<Int>()
     val cantidad: LiveData<Int> = _cantidad
 
-    private var _precio = MutableLiveData<Int>()
-    val precio:LiveData<Int> = _precio
+    private var _precio = MutableLiveData<String>()
+    val precio:LiveData<String> = _precio
 
     private var _errorGetOrders = MutableLiveData<String>()
     val errorGetOrders: LiveData<String> = _errorGetOrders
@@ -79,8 +80,9 @@ class ProductosViewModel @Inject constructor(): ViewModel(){
     fun onChangeNombre(nombre: String) {
         _nombre.value = nombre
     }
-    fun onChangePrecio(precio: Int){
-        _precio.value=precio
+    fun onChangePrecio(precio: String){
+        Log.e("ProductosViewModel", "onChangePrecio llamado con: $precio")
+        _precio.value = precio
     }
 
     fun onChangePlace(place: String) {
@@ -114,7 +116,9 @@ class ProductosViewModel @Inject constructor(): ViewModel(){
                 cantidad = _cantidad.value ?: 0,
                 id_user = 21
             )
-            val getTotal = (_cantidad.value?:0) * (_precio.value?:0)
+            val getTotal = (_cantidad.value?:0) * (_precio.value?.toInt() ?:0)
+            Log.e("getTotalOrder","${getTotal}")
+            Log.e("getTotalOrderConfirm","${_nombre.value} precio: ${_precio.value} ")
             createOrderRepository.insertOrder(
                 OrderEntity(
                     pedido = _nombre.value ?: "",

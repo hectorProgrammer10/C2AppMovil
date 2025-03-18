@@ -1,5 +1,6 @@
 package com.example.c1moviles.drogstore.home.presentations
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -66,15 +67,19 @@ import kotlin.reflect.typeOf
 import androidx.compose.ui.platform.LocalContext
 
 @Composable
-fun FormResource(productosViewModel: ProductosViewModel= hiltViewModel(), navController: NavController, nombre: String, precio: Int){
+fun FormResource(productosViewModel: ProductosViewModel= hiltViewModel(), navController: NavController, nombre: String, precio: String){
     val context = LocalContext.current
     val place:String by productosViewModel.place.observeAsState("")
     val cantidad:Int by productosViewModel.cantidad.observeAsState(0)
 
     val registrationStatus by productosViewModel.registrationStatus.observeAsState()
     val errorMessage by productosViewModel.errorMessage.observeAsState("")
+
+    Log.e("checartodo","nombre:${nombre} precio: ${precio}")
     LaunchedEffect(nombre) {
         productosViewModel.onChangeNombre(nombre)
+    }
+    LaunchedEffect(precio) {
         productosViewModel.onChangePrecio(precio)
     }
     LaunchedEffect(registrationStatus) {

@@ -1,6 +1,7 @@
 package com.example.c1moviles.drogstore.core.navigation
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
@@ -38,7 +39,8 @@ fun AppNavigator() {
         }
         composable("addProducto/{nombre}/{precio}") {backStackEntry ->
             val nombre = backStackEntry.arguments?.getString("nombre") ?: ""
-            val precio = backStackEntry.arguments?.getInt("precio")?: 0
+            val precio = backStackEntry.arguments?.getString("precio")?: ""
+            Log.e("precioNavigation", precio)
             FormResource(productosViewModel = ProductosViewModel(), navController = navController, nombre=nombre,precio =precio)
         }
         composable("viewProducto") {
