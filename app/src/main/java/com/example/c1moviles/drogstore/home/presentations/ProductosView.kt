@@ -169,7 +169,7 @@ fun FormResource(productosViewModel: ProductosViewModel= hiltViewModel(), navCon
         )
         Spacer(modifier = Modifier.height(20.dp))
         Button(
-            onClick = {productosViewModel.registerProducto() },
+            onClick = {productosViewModel.registerProducto(context) },
             modifier = Modifier.fillMaxWidth()
                 .padding(horizontal = 10.dp)
                 .height(50.dp),

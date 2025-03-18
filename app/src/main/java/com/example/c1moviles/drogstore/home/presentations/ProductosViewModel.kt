@@ -1,5 +1,11 @@
 package com.example.c1moviles.drogstore.home.presentations
+
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.os.Build
+import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -8,9 +14,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.c1moviles.drogstore.home.data.datasource.getProductos
 import com.example.c1moviles.drogstore.home.data.datasource.postPedido
-import com.example.c1moviles.drogstore.register.data.datasource.postUser
-import com.example.c1moviles.drogstore.home.data.model.Producto
 import com.example.c1moviles.drogstore.home.data.model.Pedido
+import com.example.c1moviles.drogstore.home.data.model.Producto
+import com.example.c1moviles.drogstore.home.domain.services.TimerServices
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -18,39 +24,67 @@ import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 class ProductosViewModel @Inject constructor() : ViewModel() {
+
+    private var timerBoundService: TimerServices? = null
+    private var isBound = false
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as TimerServices.LocalBinder
+            timerBoundService = binder.getService()
+            isBound = true
+            startTimer() // Iniciar el temporizador cuando el servicio esté vinculado
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            isBound = false
+            timerBoundService = null
+        }
+    }
+
     private val _registrationStatus = MutableLiveData<Boolean>()
     val registrationStatus: LiveData<Boolean> = _registrationStatus
+
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
-
 
     private val _productos = MutableLiveData<List<Producto>?>()
     val productos: LiveData<List<Producto>?> = _productos
 
     private var _nombre = MutableLiveData<String>()
-    val nombre : LiveData<String> = _nombre
+    val nombre: LiveData<String> = _nombre
 
     private var _place = MutableLiveData<String>()
-    val place : LiveData<String> = _place
-
+    val place: LiveData<String> = _place
 
     private var _cantidad = MutableLiveData<Int>()
-    val cantidad : LiveData<Int> = _cantidad
-    /////////////////////////////////////
-    fun onChangeNombre(nombre : String) {
+    val cantidad: LiveData<Int> = _cantidad
+
+    fun onChangeNombre(nombre: String) {
         _nombre.value = nombre
     }
-    fun onChangePlace(place : String) {
+
+    fun onChangePlace(place: String) {
         _place.value = place
     }
 
-    fun onChangeCantidad(cantidad : Int) {
+    fun onChangeCantidad(cantidad: Int) {
         _cantidad.value = cantidad
     }
 
-    fun registerProducto() {
+    private fun startTimer() {
+        timerBoundService?.startTimer(1 * 60 * 1000) { remainingTime ->
+            Log.d("ProductosViewModel", "Tiempo restante: ${remainingTime / 1000} segundos")
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        // Limpiar recursos si es necesario
+    }
+
+    fun registerProducto(context: Context) {
         viewModelScope.launch {
             Log.d("ProductosViewModel", "Llamando a postProducto()")
             val pedido = Pedido(
@@ -59,31 +93,42 @@ class ProductosViewModel @Inject constructor() : ViewModel() {
                 cantidad = _cantidad.value ?: 0,
                 id_user = 21
             )
-            val result = postPedido(pedido)
-
-            if (result) {
-                _registrationStatus.value = true
-                _errorMessage.value = null
-            } else {
+            try {
+                val result = postPedido(pedido)
+                if (result) {
+                    _registrationStatus.value = true
+                    _errorMessage.value = null
+                    val intent = Intent(context, TimerServices::class.java)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundService(intent)
+                    }
+                    context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+                } else {
+                    _registrationStatus.value = false
+                    _errorMessage.value = "Error al obtener. Verifica los datos e inténtalo nuevamente."
+                }
+            } catch (e: Exception) {
                 _registrationStatus.value = false
-                _errorMessage.value = "Error al obtener. Verifica los datos e inténtalo nuevamente."
+                _errorMessage.value = "Error: ${e.message}"
+                Log.e("ProductosViewModel", "Error en postPedido", e)
             }
-
-            Log.d("ProductosViewModel", "Resultado de postPedido(): $result")
         }
     }
 
     fun fetchProductos() {
         viewModelScope.launch {
-            _productos.value = getProductos()
+            try {
+                _productos.value = getProductos()
+            } catch (e: Exception) {
+                _errorMessage.value = "Error al obtener productos: ${e.message}"
+                Log.e("ProductosViewModel", "Error en fetchProductos", e)
+            }
         }
     }
 
-    // Función para obtener la ubicación actual y actualizar _place
     fun getLocation(context: Context) {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
-        // Configura la solicitud de ubicación
         val locationRequest = LocationRequest.create().apply {
             interval = 2000
             fastestInterval = 1000
@@ -91,19 +136,17 @@ class ProductosViewModel @Inject constructor() : ViewModel() {
             numUpdates = 1
         }
 
-
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 val location = locationResult.lastLocation
                 if (location != null) {
                     val locationString = "Lat: ${location.latitude}, Lon: ${location.longitude}"
                     onChangePlace(locationString)
-                    Log.d("RegisterStoreViewModel", "Ubicación obtenida: $locationString")
+                    Log.d("ProductosViewModel", "Ubicación obtenida: $locationString")
                 } else {
                     onChangePlace("Ubicación no disponible")
-                    Log.d("RegisterStoreViewModel", "La ubicación es null")
+                    Log.d("ProductosViewModel", "La ubicación es null")
                 }
-                // Una vez obtenida la ubicación, eliminamos las actualizaciones para evitar callbacks innecesarios
                 fusedLocationClient.removeLocationUpdates(this)
             }
         }
@@ -112,9 +155,7 @@ class ProductosViewModel @Inject constructor() : ViewModel() {
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
         } catch (e: SecurityException) {
             onChangePlace("Permiso denegado")
-            Log.e("RegisterStoreViewModel", "Permiso de ubicación denegado", e)
+            Log.e("ProductosViewModel", "Permiso de ubicación denegado", e)
         }
-
     }
-
 }
