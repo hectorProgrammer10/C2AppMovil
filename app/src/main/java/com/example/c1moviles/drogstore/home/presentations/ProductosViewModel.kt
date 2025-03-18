@@ -74,7 +74,7 @@ class ProductosViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun startTimer() {
-        timerBoundService?.startTimer(1 * 60 * 1000) { remainingTime ->
+        timerBoundService?.startTimer(30 * 60 * 1000) { remainingTime ->
             Log.d("ProductosViewModel", "Tiempo restante: ${remainingTime / 1000} segundos")
         }
     }

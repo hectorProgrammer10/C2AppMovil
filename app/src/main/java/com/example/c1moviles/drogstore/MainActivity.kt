@@ -5,9 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.c1moviles.drogstore.core.navigation.AppNavigator
-import com.example.c1moviles.ui.theme.C1movilesTheme
 
-import dagger.hilt.android.AndroidEntryPoint
 
 
 class MainActivity : ComponentActivity() {
