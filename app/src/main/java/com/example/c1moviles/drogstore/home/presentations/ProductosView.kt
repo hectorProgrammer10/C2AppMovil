@@ -66,7 +66,7 @@ import kotlin.reflect.typeOf
 import androidx.compose.ui.platform.LocalContext
 
 @Composable
-fun FormResource(productosViewModel: ProductosViewModel= hiltViewModel(), navController: NavController, nombre: String){
+fun FormResource(productosViewModel: ProductosViewModel= hiltViewModel(), navController: NavController, nombre: String, precio: Int){
     val context = LocalContext.current
     val place:String by productosViewModel.place.observeAsState("")
     val cantidad:Int by productosViewModel.cantidad.observeAsState(0)
@@ -75,6 +75,7 @@ fun FormResource(productosViewModel: ProductosViewModel= hiltViewModel(), navCon
     val errorMessage by productosViewModel.errorMessage.observeAsState("")
     LaunchedEffect(nombre) {
         productosViewModel.onChangeNombre(nombre)
+        productosViewModel.onChangePrecio(precio)
     }
     LaunchedEffect(registrationStatus) {
         if (registrationStatus == true) {
@@ -256,7 +257,7 @@ fun ProductoItem(producto: Producto, navController: NavController) {
                         clip = true
 
                     },
-                onClick = {navController.navigate("addProducto/${producto.nombre}")},
+                onClick = {navController.navigate("addProducto/${producto.nombre}/${producto.precio}")},
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFFFC245), // Color de fondo del botón
                     contentColor = Color.Black // Color del texto

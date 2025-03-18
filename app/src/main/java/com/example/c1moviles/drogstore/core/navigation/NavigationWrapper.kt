@@ -16,9 +16,6 @@ import com.example.c1moviles.drogstore.login.presentation.LoginScreen
 import com.example.c1moviles.drogstore.login.presentation.LoginViewModel
 import com.example.c1moviles.drogstore.register.presentation.RegisterScreen
 import com.example.c1moviles.drogstore.register.presentation.RegisterViewModel
-import androidx.hilt.navigation.compose.hiltViewModel
-
-
 
 
 @SuppressLint("ViewModelConstructorInComposable")
@@ -37,14 +34,15 @@ fun AppNavigator() {
             )
         }
         composable("home") {
-            Home(navController = navController)
+            Home(navController = navController, productosViewModel = ProductosViewModel(context))
         }
-        composable("addProducto/{nombre}") {backStackEntry ->
+        composable("addProducto/{nombre}/{precio}") {backStackEntry ->
             val nombre = backStackEntry.arguments?.getString("nombre") ?: ""
-            FormResource(productosViewModel = ProductosViewModel(), navController = navController, nombre=nombre)
+            val precio = backStackEntry.arguments?.getInt("precio")?: 0
+            FormResource(productosViewModel = ProductosViewModel(context), navController = navController, nombre=nombre,precio =precio)
         }
         composable("viewProducto") {
-            ViewProductos(productosViewModel = ProductosViewModel(), navController = navController)
+            ViewProductos(productosViewModel = ProductosViewModel(context), navController = navController)
         }
 
 
