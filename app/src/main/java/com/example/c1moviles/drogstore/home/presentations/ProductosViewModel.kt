@@ -12,6 +12,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.c1moviles.drogstore.core.data.local.order.entities.OrderEntity
 import com.example.c1moviles.drogstore.home.data.datasource.getProductos
@@ -27,7 +28,7 @@ import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ProductosViewModel @Inject constructor(app: Context) : AndroidViewModel(app as Application) {
+class ProductosViewModel @Inject constructor(): ViewModel(){
 
     private var timerBoundService: TimerServices? = null
     private var isBound = false
@@ -46,7 +47,7 @@ class ProductosViewModel @Inject constructor(app: Context) : AndroidViewModel(ap
         }
     }
 
-    private val createOrderRepository = ProductRepository(app)
+    //private val createOrderRepository = ProductRepository(app)
 
     private val _registrationStatus = MutableLiveData<Boolean>()
     val registrationStatus: LiveData<Boolean> = _registrationStatus
@@ -103,6 +104,8 @@ class ProductosViewModel @Inject constructor(app: Context) : AndroidViewModel(ap
     }
 
     fun registerProducto(context: Context) {
+        val createOrderRepository = ProductRepository(context)
+
         viewModelScope.launch {
             Log.d("ProductosViewModel", "Llamando a postProducto()")
             val pedido = Pedido(
@@ -156,10 +159,12 @@ class ProductosViewModel @Inject constructor(app: Context) : AndroidViewModel(ap
         }
     }
 
-    fun getOrders(){
+    fun getOrders(context: Application){
+        val createOrderRepository = ProductRepository(context)
         val idUser = 21
         viewModelScope.launch {
             try{
+
                 _orders.value = createOrderRepository.getOrders(idUser)
             }catch(e: Exception){
                 _errorGetOrders.value = "Error al obtener ordenes: ${e.message}"

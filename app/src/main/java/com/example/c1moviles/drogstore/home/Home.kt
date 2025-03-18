@@ -1,5 +1,6 @@
 package com.example.c1moviles.drogstore.home
 
+import android.app.Application
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,10 +43,11 @@ import com.example.c1moviles.drogstore.home.presentations.ProductosViewModel
 @Composable
 fun Home(navController: NavController,productosViewModel: ProductosViewModel) {
 
+    val context = LocalContext.current.applicationContext as Application
     val orders: List<OrderEntity> by productosViewModel.orders.observeAsState(emptyList())
 
     LaunchedEffect(Unit) {
-        productosViewModel.getOrders()
+        productosViewModel.getOrders(context)
     }
     Column(
         modifier = Modifier

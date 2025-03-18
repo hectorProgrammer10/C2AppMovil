@@ -2,9 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.dagger.hilt.android)
-    id("org.jetbrains.kotlin.kapt")
-    id("com.google.devtools.ksp") version "1.9.0-1.0.13" apply true
+    id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
 }
 
@@ -49,6 +47,11 @@ configurations.all {
     exclude(group = "junit", module = "junit")
 }
 dependencies {
+    val room_version = "2.6.1"
+    implementation("androidx.room:room-runtime:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
+    annotationProcessor("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
     implementation("com.google.firebase:firebase-messaging-ktx")
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-analytics")
@@ -65,7 +68,6 @@ dependencies {
     implementation("io.ktor:ktor-client-logging:2.3.4")
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.dagger.hilt.android)
-    kapt(libs.dagger.hilt.compiler)
     implementation(libs.com.squareup.retrofit2.retrofit)
     implementation(libs.com.squareup.retrofit2.converter.json)
     implementation(libs.androidx.compose.material.icons.extended)
@@ -89,8 +91,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-    ksp(libs.room.compiler)
 }

@@ -34,15 +34,15 @@ fun AppNavigator() {
             )
         }
         composable("home") {
-            Home(navController = navController, productosViewModel = ProductosViewModel(context))
+            Home(navController = navController, productosViewModel = ProductosViewModel())
         }
         composable("addProducto/{nombre}/{precio}") {backStackEntry ->
             val nombre = backStackEntry.arguments?.getString("nombre") ?: ""
             val precio = backStackEntry.arguments?.getInt("precio")?: 0
-            FormResource(productosViewModel = ProductosViewModel(context), navController = navController, nombre=nombre,precio =precio)
+            FormResource(productosViewModel = ProductosViewModel(), navController = navController, nombre=nombre,precio =precio)
         }
         composable("viewProducto") {
-            ViewProductos(productosViewModel = ProductosViewModel(context), navController = navController)
+            ViewProductos(productosViewModel = ProductosViewModel(), navController = navController)
         }
 
 
